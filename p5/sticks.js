@@ -92,7 +92,7 @@ function draw() {
 
     const slotW = width / N_SLOTS;
     const frac  = constrain(distance / maxDist, 0, 1);
-    const barW  = frac * width;                 // white covers [0, barW] from left
+    const barW  = (1 - frac) * width;           // white grows as distance DECREASES
 
     // Live rotation from current accelerometer (pitch/roll, like the cube).
     const pitch = Math.atan2(ay, Math.sqrt(ax * ax + az * az));
