@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>OskarToF visualizer</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, system-ui, sans-serif;
+      background: #111;
+      color: #eee;
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+    }
+    #sidebar {
+      width: 260px;
+      padding: 16px;
+      box-sizing: border-box;
+      border-right: 1px solid #333;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    #connect {
+      padding: 8px 12px;
+      font-size: 14px;
+      background: #2a72d6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #connect:disabled { background: #444; cursor: default; }
+    #status { font-size: 12px; color: #888; }
+    #alt-link { font-size: 13px; color: #2a72d6; text-decoration: none; }
+    #alt-link:hover { text-decoration: underline; }
+    #bar-label { font-size: 13px; margin-top: 8px; }
+    #bar-track {
+      width: 100%;
+      height: 16px;
+      background: #222;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    #bar-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(to right, #2bd47f, #d6d62a, #d62a2a);
+      transition: width 60ms linear;
+    }
+    .readout {
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 11px;
+      color: #aaa;
+      white-space: pre;
+    }
+    #canvas-container { flex: 1; display: flex; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+  <aside id="sidebar">
+    <button id="connect">Connect to base</button>
+    <div id="status">disconnected</div>
+
+    <div id="bar-label">Distance: —</div>
+    <div id="bar-track"><div id="bar-fill"></div></div>
+
+    <div class="readout" id="imu-readout">acc: —
+gyr: —</div>
+
+    <a id="alt-link" href="sticks.html">→ sticks visualizer</a>
+
+    <div class="readout" style="margin-top:auto;color:#555">
+Chrome/Edge only.
+Plug in the base, click Connect,
+pick the /cu.usbmodem… port.
+    </div>
+  </aside>
+  <main id="canvas-container"></main>
+
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
+  <script src="sketch.js"></script>
+</body>
+</html>
