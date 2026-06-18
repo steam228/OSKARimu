@@ -89,7 +89,11 @@ static void scanI2C() {
 // ---------------- Setup ----------------
 void setup() {
     Serial.begin(115200);
-    delay(500);
+    // Wait up to 3s for host to open the USB CDC port (otherwise prints fired
+    // during the post-reset re-enumeration window get silently dropped).
+    uint32_t t0 = millis();
+    while (!Serial && millis() - t0 < 3000) delay(10);
+    delay(200);
     Serial.println();
     Serial.println("=== sensor boot ===");
 
@@ -110,10 +114,29 @@ void setup() {
         Serial.printf("VL53L3CX init failed (status=%d)\n", s);
     }
 
+    // BMI088 — under battery power the accel chip's wake-from-suspend can
+    // miss its initialize() command (slow LDO ramp / brief brown-out). Verify
+    // by reading the accel chip ID (expected 0x1E) and retry if wrong.
+    delay(100);                                         // let the rail settle on battery
     if (imu.isConnection()) {
-        imu.initialize();
-        imu_ok = true;
-        Serial.println("BMI088 ready");
+        int tries = 0;
+        uint8_t accId = 0;
+        while (tries < 5) {
+            imu.initialize();
+            delay(60);                                  // accel needs ~50ms after power mode change
+            accId = imu.getAccID();
+            if (accId == 0x1E) break;
+            Serial.printf("BMI088 accel wake retry %d (got id=0x%02X)\n", tries + 1, accId);
+            tries++;
+            delay(100);
+        }
+        if (accId == 0x1E) {
+            imu_ok = true;
+            Serial.println("BMI088 ready");
+        } else {
+            Serial.printf("BMI088 accel failed to wake (id=0x%02X) — gyro may still work\n", accId);
+            imu_ok = true;   // keep going; gyro side is independent
+        }
     } else {
         Serial.println("BMI088 not detected");
     }
